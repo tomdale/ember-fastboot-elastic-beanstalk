@@ -1,7 +1,5 @@
-var assert         = require('assert');
 var fs             = require('fs');
 var fsp            = require('fs-promise');
-var path           = require('path');
 var RSVP           = require('rsvp');
 var Promise        = RSVP.Promise;
 var exec           = RSVP.denodeify(require('child_process').exec);
@@ -12,7 +10,6 @@ var AWS            = require('aws-sdk');
 var FastBootServer = require('ember-fastboot-server');
 var basicAuth      = require('./basic-auth');
 
-var APP_NAME  = process.env.FASTBOOT_APP_NAME;
 var S3_BUCKET = process.env.FASTBOOT_S3_BUCKET;
 var S3_KEY    = process.env.FASTBOOT_S3_KEY;
 var USERNAME  = process.env.FASTBOOT_USERNAME;
@@ -57,7 +54,7 @@ function removeOldApp() {
 // and FASTBOOT_S3_KEY environment variables. We'll save that file to
 // `fastboot-dist.zip`.
 function downloadAppZip() {
-  return new RSVP.Promise(function(res, rej) {
+  return new Promise(function(res, rej) {
     var s3 = new AWS.S3();
     var params = {
       Bucket: S3_BUCKET,
@@ -100,9 +97,7 @@ function startServer() {
       });
     } else {
       var server = new FastBootServer({
-        appFile: findAppFile(),
-        vendorFile: findVendorFile(),
-        htmlFile: findHTMLFile(),
+        distPath: OUTPUT_PATH,
         ui: {
           writeLine: function() {
             log.apply(null, arguments);
@@ -122,29 +117,8 @@ function startServer() {
   }, { verbose: true });
 }
 
-function findAppFile() {
-  return findFile("app", path.join(OUTPUT_PATH, "assets", APP_NAME + "*.js"));
-}
-
-function findVendorFile() {
-  return findFile("vendor", path.join(OUTPUT_PATH, "assets", "vendor*.js"));
-}
-
-function findHTMLFile() {
-  return findFile('html', path.join(OUTPUT_PATH, 'index*.html'));
-}
-
-function findFile(name, globPath) {
-  var glob = require('glob');
-  var files = glob.sync(globPath);
-
-  assert(files.length === 1, "Found " + files.length + " " + name + " files (expected 1) when globbing '" + globPath + "'.");
-
-  return files[0];
-}
-
 function findMissingEnvVars() {
-  var requiredEnvs = ['APP_NAME', 'S3_BUCKET', 'S3_KEY'];
+  var requiredEnvs = ['S3_BUCKET', 'S3_KEY'];
 
   for (var i = 0; i < requiredEnvs.length; i++) {
     var name = requiredEnvs[i];
@@ -176,4 +150,3 @@ function execAndPrint() {
       }
     });
 }
-

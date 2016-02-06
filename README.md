@@ -77,8 +77,6 @@ your FastBoot app.
 
 You'll need:
 
-* The name of your Ember app (e.g., if you ran `ember new my-app`, the
-  name of your app is `my-app`)
 * The S3 bucket you created in the first step
 * The S3 key for the zip file you uploaded
 
@@ -87,7 +85,7 @@ variables using the `--envvars` option. These options tell the FastBoot
 server where to download your app from.
 
 ```sh
-eb create --envvars FASTBOOT_APP_NAME=<app-name>,FASTBOOT_S3_BUCKET=<s3-bucket>,FASTBOOT_S3_KEY=<s3-key>
+eb create --envvars FASTBOOT_S3_BUCKET=<s3-bucket>,FASTBOOT_S3_KEY=<s3-key>
 ```
 
 Enter a name and a DNS CNAME prefix. (The CNAME prefix is used to create
